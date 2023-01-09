@@ -1,9 +1,9 @@
 import type { AxiosResponse } from 'axios'
 import type { Transport } from 'nodemailer'
 
-import Mail, { Address } from 'nodemailer/lib/mailer'
-import MailMessage from 'nodemailer/lib/mailer/mail-message'
-import MimeNode from 'nodemailer/lib/mime-node'
+import type { Address, Options } from 'nodemailer/lib/mailer'
+import type MailMessage from 'nodemailer/lib/mailer/mail-message'
+import type { Envelope } from 'nodemailer/lib/mime-node'
 
 import {
   BASE_PATH,
@@ -14,17 +14,14 @@ import {
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 declare namespace PostmanNodemailerTransport {
-  type MailOptions = Mail.Options
+  type MailOptions = Options
 
   interface SentMessageInfo {
     /** an envelope object {from:‘address’, to:[‘address’]} */
-    envelope: MimeNode.Envelope
+    envelope: Envelope
     /** the Message-ID header value */
     messageId: string
     message: Buffer
-    accepted: Array<string | Mail.Address>
-    rejected: Array<string | Mail.Address>
-    pending: Array<string | Mail.Address>
     response: string
   }
 }
@@ -46,7 +43,7 @@ export class PostmanNodemailerTransport implements Transport {
   }
 
   private pickFirstAddressee(
-    addressees: string | Mail.Address | (string | Mail.Address)[] | undefined,
+    addressees: string | Address | (string | Address)[] | undefined,
   ) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return ([] as (Address | string | undefined)[]).concat(addressees).shift()
@@ -76,11 +73,8 @@ export class PostmanNodemailerTransport implements Transport {
       callback(error, {
         messageId: response?.data?.id ?? 'unknown',
         message: Buffer.from(response?.data?.params?.body ?? '<no body>'),
-        envelope: mail.data.envelope as MimeNode.Envelope,
-        response: response?.data?.id ?? 'unknown',
-        accepted: [],
-        pending: [],
-        rejected: [],
+        envelope: mail.data.envelope as Envelope,
+        response: response?.data?.status ?? 'UNKNOWN',
       })
     }
 
