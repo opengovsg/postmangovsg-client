@@ -6,7 +6,6 @@ import type MailMessage from 'nodemailer/lib/mailer/mail-message'
 import type { Envelope } from 'nodemailer/lib/mime-node'
 
 import {
-  BASE_PATH,
   EmailApi,
   EmailMessageTransactional,
   TransactionalEmailSendPostRequest,
@@ -31,10 +30,7 @@ export class PostmanNodemailerTransport implements Transport {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   readonly version = require('../package.json').version
 
-  constructor(
-    private apiKey: string,
-    private api: EmailApi = new EmailApi(undefined, BASE_PATH),
-  ) {}
+  constructor(private apiKey: string, private api: EmailApi = new EmailApi()) {}
 
   private getAddress(addressee: string | Address | undefined) {
     return !addressee || typeof addressee === 'string'
