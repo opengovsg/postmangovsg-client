@@ -38,6 +38,12 @@ export class PostmanNodemailerTransport implements Transport {
       : addressee.address
   }
 
+  private getFormattedAddress(addressee: string | Address | undefined) {
+    return !addressee || typeof addressee === 'string'
+      ? addressee
+      : `${addressee.name} <${addressee.address}>`
+  }
+
   private pickFirstAddressee(
     addressees: string | Address | (string | Address)[] | undefined,
   ) {
@@ -56,7 +62,7 @@ export class PostmanNodemailerTransport implements Transport {
     const request: TransactionalEmailSendPostRequest = {
       subject: mail.data.subject!,
       recipient: this.getAddress(this.pickFirstAddressee(mail.data.to))!,
-      from: this.getAddress(mail.data.from!),
+      from: this.getFormattedAddress(mail.data.from!),
       reply_to: this.getAddress(this.pickFirstAddressee(mail.data.replyTo)),
       body: (mail.data.html ?? mail.data.text) + '',
     }
