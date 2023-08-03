@@ -65,6 +65,8 @@ export class PostmanNodemailerTransport implements Transport {
       from: this.getFormattedAddress(mail.data.from!),
       reply_to: this.getAddress(this.pickFirstAddressee(mail.data.replyTo)),
       body: (mail.data.html ?? mail.data.text) + '',
+      cc: mail.data.cc,
+      bcc: mail.data.bcc,
     }
     /* eslint-enable @typescript-eslint/no-non-null-assertion */
 
