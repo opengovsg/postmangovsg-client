@@ -44,6 +44,21 @@ export class PostmanNodemailerTransport implements Transport {
       : `${addressee.name} <${addressee.address}>`
   }
 
+  private getFormattedAddresses(
+    addressees: string | Address | (string | Address)[] | undefined,
+  ) {
+    const result = [] as string[]
+    for (const address of ([] as (Address | string | undefined)[]).concat(
+      addressees,
+    )) {
+      const formattedAddress = this.getFormattedAddress(address)
+      if (formattedAddress) {
+        result.push(formattedAddress)
+      }
+    }
+    return result
+  }
+
   private pickFirstAddressee(
     addressees: string | Address | (string | Address)[] | undefined,
   ) {
@@ -65,8 +80,8 @@ export class PostmanNodemailerTransport implements Transport {
       from: this.getFormattedAddress(mail.data.from!),
       reply_to: this.getAddress(this.pickFirstAddressee(mail.data.replyTo)),
       body: (mail.data.html ?? mail.data.text) + '',
-      cc: mail.data.cc,
-      bcc: mail.data.bcc,
+      cc: this.getFormattedAddresses(mail.data.cc),
+      bcc: this.getFormattedAddresses(mail.data.bcc),
     }
     /* eslint-enable @typescript-eslint/no-non-null-assertion */
 
